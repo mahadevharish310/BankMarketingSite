@@ -8,6 +8,12 @@ const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
+const tabs = document.querySelectorAll('.operations__tab');
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+
+const nav = document.querySelector('.nav');
+
 ///////////////////////////////////////
 
 // Modal window
@@ -50,6 +56,7 @@ btnScrollTo.addEventListener('click', function (e) {
 
   // cuurent scroll position ---the viewport scroll position
   console.log('Current scroll (X/Y)', window.pageXOffset, window.pageYOffset);
+
   console.log(
     'height/width viewport',
     document.documentElement.clientHeight,
@@ -95,14 +102,63 @@ btnScrollTo.addEventListener('click', function (e) {
 
 // 2. Determine what element originated the event
 
-document.querySelector('.nav__link').addEventListener('click', function (e) {
-  console.log(e.target); // element in the nav link
+document.querySelector('.nav__links').addEventListener('click', function (e) {
+  console.log(e.target); //  where the event occured element in the nav link
   e.preventDefault();
+
+  // Matching strategy --to ignore click events outside the links
+
+  if (e.target.classList.contains('nav__link')) {
+    const id = e.target.getAttribute('href');
+    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+  }
 });
 
-// Matching strategy --to ignore click events outside the links
+// Tabbed Component
 
-if (e.target.classList.contains('nav__links')) {
-  const id = e.target.getAttribute('href');
-  document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
-}
+tabsContainer.addEventListener('click', function (e) {
+  const clicked = e.target.closest('.operations__tab');
+
+  // Guard clause
+  if (!clicked) return;
+
+  // remove the active classes
+  tabs.forEach(t => t.classList.remove('operations__tab--active'));
+  tabsContent.forEach(c => c.classList.remove('operations__content--active'));
+
+  // active tab
+  clicked.classList.add('operations__tab--active');
+
+  // activate the content area
+  console.log(clicked.dataset.tab);
+  document
+    .querySelector(`.operations__content--${clicked.dataset.tab}`)
+    .classList.add('operations__content--active');
+});
+
+// MenU fade animation
+nav.addEventListener('mouseover', function (e) {
+  if (e.target.classList.contains('nav__link')) {
+    const link = e.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('img');
+
+    siblings.forEach(el => {
+      if (el !== link) el.style.opacity = 0.5;
+    });
+    logo.style.opacity = 0.5;
+  }
+});
+
+nav.addEventListener('mouseout', function (e) {
+  if (e.target.classList.contains('nav__link')) {
+    const link = e.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('img');
+
+    siblings.forEach(el => {
+      if (el !== link) el.style.opacity = 1;
+    });
+    logo.style.opacity = 1;
+  }
+});
